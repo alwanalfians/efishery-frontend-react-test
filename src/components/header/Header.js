@@ -1,19 +1,18 @@
-import { PageHeader } from 'antd';
+import { Layout } from 'antd';
 import 'antd/dist/antd.css';
 import './Header.scss';
-import Logo from '../../assets/img/eFishery-logo.png';
+import Logo from '../../assets/img/eFishery-logo-with-text-white.png';
 
 const Header = (props) => {
 
     const { title, subTitle } = props;
 
     return (
-        <PageHeader
-          className="site-page-header"
-          title={ title }
-          subTitle={ subTitle }
-          avatar={{ src: Logo }}
-        />
+        <Layout.Header className="site-page-header">
+            <div className="logo">
+                <img src={ Logo } height="32px"/>
+            </div>
+        </Layout.Header>
     );
 }
 
