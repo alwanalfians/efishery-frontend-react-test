@@ -2,6 +2,8 @@ import initialState from './state';
 
 const reducer = (state = initialState, action) => {
 
+    console.log(action)
+
     switch (action.type) {
         case 'GET_FISH_DATA':
             return {
@@ -20,21 +22,20 @@ const reducer = (state = initialState, action) => {
         case 'EDIT_FISH_DATA':
             return {
                 ...state,
-                fishData: state.fishData.map(data => {
-                    if (action.data.uuid !== data.uuid) {
-                        return data 
-                    }
-            
-                    return {
-                        ...data,
-                        ...action.data
-                    }
-                })
+                state: {
+                    fishData: state.state.fishData.map(data => {
+                        if (action.data.uuid !== data.uuid) {
+                            return data 
+                        } else {
+                            return action.data
+                        }
+                    })
+                }
             }
         case 'DELETE_FISH_DATA':
             return {
                 ...state,
-                fishData: state.fishData.filter(({ uuid }) => uuid !== action.data.uuid)
+                fishData: state.state.fishData.filter(({ uuid }) => uuid !== action.data.uuid)
             }
         default:
             return {

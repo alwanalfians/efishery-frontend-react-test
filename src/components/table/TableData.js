@@ -1,4 +1,4 @@
-import { Table, Space, Row, Col, Input, Modal, Button } from 'antd';
+import { Table, Space, Row, Col, Input, Modal, Button, Typography } from 'antd';
 import React, { PureComponent } from 'react';
 import 'antd/dist/antd.css';
 import * as helper from '../../lib/helper';
@@ -78,7 +78,7 @@ class TableData extends PureComponent {
                 title: 'Tanggal',
                 dataIndex: 'tgl_parsed',
                 key: 'tgl_parsed',
-                render: text => <>{ helper.dateParser(text) }</>
+                render: text => <>{ helper.dateParser(text) ? helper.dateParser(text) : '' }</>
             },
             {
                 title: 'Action',
@@ -126,14 +126,7 @@ class TableData extends PureComponent {
         );
     }
 
-    onChangeDate = (date, dateString) => {
-        this.setState({
-            date: dateString
-        })
-    }
-
     handleShowForm (value, formType = "add") {
-
         if (value === false) {
             this.setState({
                 uuid: '',
@@ -141,8 +134,7 @@ class TableData extends PureComponent {
                 province: '',
                 city: '',
                 size: '',
-                price: '',
-                date: ''
+                price: ''
             });
         }
 
@@ -153,26 +145,19 @@ class TableData extends PureComponent {
     };
 
     handleEditData = (data) => {
-
-        const splitDateAndTime = data.tgl_parsed.split(' ')[0];
-        const convertDateFormat = splitDateAndTime.split('-');
-
         this.setState({
             uuid: data.uuid,
             commodity: data.komoditas,
             province: data.area_provinsi,
             city: data.area_kota,
             size: data.size,
-            price: data.price,
-            date: convertDateFormat[1] + '/' + convertDateFormat[2] + '/' + convertDateFormat[0]
+            price: data.price
         });
     }
 
     handleSubmit () {
-        const { uuid, commodity, province, city, size, price, date, formType } = this.state;
-        const convertDateFormat = date.split('-');
-
-        console.log(convertDateFormat)
+        const { uuid, commodity, province, city, size, price, formType } = this.state;
+        const date = helper.getCurrentYear() + '/' + helper.getCurrentMonth() + '/' + helper.getCurrentDay()
 
         Swal.fire({
             title: 'Confirmation', 
@@ -186,14 +171,13 @@ class TableData extends PureComponent {
             showLoaderOnConfirm: true,
             preConfirm: () => {
                 if (formType === 'add') {
-                    fishService.createData({
+                    this.props.createData({
                         komoditas: commodity,
                         area_provinsi: province,
                         area_kota: city,
                         size: size,
                         price: price,
-                        timestamp: +new Date(),
-                        tgl_parsed: convertDateFormat[0] + '/' + convertDateFormat[2] + '/' + convertDateFormat[1],
+                        tgl_parsed: date,
                         uuid: 'id' + helper.getCurrentDay() + '' + helper.getCurrentMonth() + '' + helper.getCurrentYear() + '' + Math.random()
                     }).then(() => {
                         Swal.fire({
@@ -208,15 +192,14 @@ class TableData extends PureComponent {
                         })
                     })
                 } else {
-                    fishService.updateData({
+                    this.props.updateData({
                         uuid: uuid,
                         komoditas: commodity,
                         area_provinsi: province,
                         area_kota: city,
                         size: size,
                         price: price,
-                        timestamp: +new Date(),
-                        tgl_parsed: convertDateFormat[0] + '/' + convertDateFormat[2] + '/' + convertDateFormat[1]
+                        tgl_parsed: date
                     }).then(() => {
                         Swal.fire({
                             title: "Success!",
@@ -246,7 +229,7 @@ class TableData extends PureComponent {
             cancelButtonText: 'Cancel',
             showLoaderOnConfirm: true,
             preConfirm: () => {
-                fishService.deleteData({uuid: id}).then(() => {
+                this.props.deleteData({uuid: id}).then(() => {
                     Swal.fire({
                         title: "Success!",
                         text: "Data berhasil dihapus",
@@ -271,7 +254,7 @@ class TableData extends PureComponent {
                 onCancel={ () => this.handleShowForm(false) }
                 footer={[
                     <Button key="back" onClick={ () => this.handleShowForm(false) }>
-                        Return
+                        Cancel
                     </Button>,
                     <Button key="submit" type="primary" onClick={ this.handleSubmit } ghost>
                         { this.state.formType === "add" ? 'Submit' : 'Save Changes' }
@@ -284,7 +267,7 @@ class TableData extends PureComponent {
                         <Form.Control
                             type="text"
                             placeholder='Komoditas'
-                            value={ this.state.commodity }
+                            defaultValue={ this.state.commodity }
                             onChange={ (e) => this.setState({ commodity: e.target.value }) }
                         />
                     </Form.Group>
@@ -294,7 +277,7 @@ class TableData extends PureComponent {
                         <Form.Control
                             type="number"
                             placeholder='Harga'
-                            value={ this.state.price }
+                            defaultValue={ this.state.price }
                             onChange={ (e) => this.setState({ price: e.target.value }) }
                         />
                     </Form.Group>
@@ -302,8 +285,8 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Ukuran</Form.Label>
                         <Form.Select
-                            value={ this.state.size }
-                            onChange={ (value) => this.setState({ size: value }) }
+                            defaultValue={ this.state.size }
+                            onChange={ (e) => this.setState({ size: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
                             {
@@ -317,8 +300,8 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Area Provinsi</Form.Label>
                         <Form.Select
-                            value={ this.state.province }
-                            onChange={ (value) => this.setState({ province: value }) }
+                            defaultValue={ this.state.province }
+                            onChange={ (e) => this.setState({ province: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
                             {
@@ -332,8 +315,8 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Area kota</Form.Label>
                         <Form.Select
-                            value={ this.state.city }
-                            onChange={ (value) => this.setState({ city: value }) }
+                            defaultValue={ this.state.city }
+                            onChange={ (e) => this.setState({ city: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
                             {
@@ -343,17 +326,7 @@ class TableData extends PureComponent {
                             }
                         </Form.Select>
                     </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Tanggal</Form.Label>
-                        <Form.Control
-                            type="text"
-                            defaultValue={ this.state.date }
-                            onChange={ (e) => this.setState({ date: e.target.value }) }
-                        />
-                    </Form.Group>
                 </Form>
-               
             </Modal>
         )
     }
@@ -367,6 +340,9 @@ class TableData extends PureComponent {
                     </Col>
                 </Row>
                 <Row justify="end" className='row-margin-bot'>
+                    <Col span={ 20 }>
+                        <Typography.Title level={2}>Data Komoditas</Typography.Title>
+                    </Col>
                     <Col span={ 4 }>
                         <Input
                             onChange={ (e) => this.setState({ searchText: e.target.value }) }

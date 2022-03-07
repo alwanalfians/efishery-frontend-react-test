@@ -4,44 +4,80 @@ const store = new SteinStore(
     "https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4"
 );
 
-export const getData = async () => {
-    try {
-        const data = await store.read('list')
-        return data
-    } catch (error) {
-        throw error
+const storeData = {
+    type: '',
+    data: null
+}
+
+export function getData() {
+    return async dispatch => {
+        try {
+            const data = await store.read('list')
+            if (data) {
+                dispatch({
+                    type: 'GET_FISH_DATA',
+                    data: data
+                })
+            }
+        } catch (error) {
+            throw error
+        }
     }
 }
 
-export const createData = async (payload) => {
-    try {
-        const data = await store.append('list', [payload])
-        return data
-    } catch (error) {
-        throw error
+export function createData(payload) {
+
+    console.log(payload)
+
+    return async dispatch => {
+        try {
+            const data = await store.append('list', [payload])
+            if (data) {
+                dispatch({
+                    type: 'ADD_FISH_DATA',
+                    data: payload
+                })
+            }
+        } catch (error) {
+            throw error
+        }
     }
 }
 
-export const updateData = async (payload) => {
-    try {
-        const data = await store.edit('list', {
-            search: { uuid: payload.uuid },
-            set: { ...payload }
-        })
-        return data
-    } catch (error) {
-        throw error
+export function updateData(payload) {
+    return async dispatch => {
+        try {
+            const data = await store.edit('list', {
+                search: { uuid: payload.uuid },
+                set: { ...payload }
+            })
+            if (data) {
+                dispatch({
+                    type: 'EDIT_FISH_DATA',
+                    data: payload
+                })
+            }
+        } catch (error) {
+            throw error
+        }
     }
 }
 
-export const deleteData = async (payload) => {
-    try {
-        const data = await store.delete('list', {
-            search: { uuid: payload.uuid }
-        })
-        return data
-    } catch (error) {
-        throw error
+export function deleteData (payload) {
+    return async dispatch => {
+        try {
+            const data = await store.delete('list', {
+                search: { uuid: payload.uuid }
+            })
+            if (data) {
+                dispatch({
+                    type: 'DELETE_FISH_DATA',
+                    data: payload
+                })
+            }
+        } catch (error) {
+            throw error
+        }
     }
 }
 

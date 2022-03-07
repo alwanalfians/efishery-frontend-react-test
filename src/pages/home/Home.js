@@ -11,17 +11,22 @@ import { connect } from "react-redux";
 class Home extends Component {
 
     componentDidMount() {
-        this.props.getFishData()
+        this.props.getData()
     };
 
     render() {
+        const { fishData, createData, updateData, deleteData } = this.props
+
         return (
             <Layout className="layout">
                 <Header />
                 <Layout.Content style={{ padding: '0 50px' }}>
                     <div className="site-layout-content">
                         <TableData
-                            data={ this.props.fishData }
+                            data={ fishData }
+                            createData={ createData }
+                            updateData={ updateData }
+                            deleteData={ deleteData }
                         />
                     </div>
                 </Layout.Content>
@@ -32,22 +37,12 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
+
+    console.log(state)
+
     return {
         fishData: state.state.fishData
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        getFishData: () => {
-            fishService.getData().then((res) => {
-                dispatch({
-                    type: 'GET_FISH_DATA',
-                    data: res
-                })
-            })
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, fishService)(Home);

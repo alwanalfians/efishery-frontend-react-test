@@ -5,7 +5,6 @@ export const numberFormat = (value, delimiter) => {
 }
 
 export const dateParser = (date) => {
-
     const result = new Date(date)
     const month = monthList()
     const parsedDate = result.getDate() + ' ' +  month[result.getMonth()].long + ' ' + result.getFullYear()
