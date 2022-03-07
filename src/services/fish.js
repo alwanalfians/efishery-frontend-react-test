@@ -4,11 +4,6 @@ const store = new SteinStore(
     "https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4"
 );
 
-const storeData = {
-    type: '',
-    data: null
-}
-
 export function getData() {
     return async dispatch => {
         try {
