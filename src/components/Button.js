@@ -2,10 +2,18 @@ import { Button } from 'antd';
 import 'antd/dist/antd.css';
 
 const CustomButton = (props) => {
-    const { onClick, text, size, type } = props
+    const { key, onClick, text, size, type, block , danger, ghost } = props
 
     return (
-        <Button type={ type || "primary" } size={ size || "default" } onClick={ onClick }>
+        <Button
+            key={ key }
+            type={ type || "primary" }
+            size={ size || "default" }
+            onClick={ onClick }
+            block={ block }
+            danger={ danger }
+            ghost={ ghost }
+        >
             { text }
         </Button>
     )

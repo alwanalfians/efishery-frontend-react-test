@@ -3,13 +3,6 @@ import initialState from './state';
 const reducer = (state = initialState, action) => {
 
     switch (action.type) {
-        case 'SET_LOADING':
-            return {
-                ...state,
-                state: {
-                    loading: action.data
-                }
-            }
         case 'GET_FISH_DATA':
             return {
                 ...state,
@@ -20,7 +13,9 @@ const reducer = (state = initialState, action) => {
         case 'ADD_FISH_DATA':
             return {
                 ...state,
-                fishData: state.fishData.concat(action.data)
+                state: {
+                    fishData: state.state.fishData.concat(action.data)
+                }
             }
         case 'EDIT_FISH_DATA':
             return {
