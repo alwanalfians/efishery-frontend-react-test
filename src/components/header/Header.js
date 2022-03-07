@@ -7,7 +7,7 @@ const Header = () => {
     return (
         <Layout.Header className="site-page-header">
             <div className="logo">
-                <img src={ Logo } height="32px"/>
+                <img src={ Logo } height="32px" alt='efishery-logo'/>
             </div>
         </Layout.Header>
     );
