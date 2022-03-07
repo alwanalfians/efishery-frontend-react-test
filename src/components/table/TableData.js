@@ -267,7 +267,7 @@ class TableData extends PureComponent {
                         <Form.Control
                             type="text"
                             placeholder='Komoditas'
-                            defaultValue={ this.state.commodity }
+                            value={ this.state.commodity }
                             onChange={ (e) => this.setState({ commodity: e.target.value }) }
                         />
                     </Form.Group>
@@ -277,7 +277,7 @@ class TableData extends PureComponent {
                         <Form.Control
                             type="number"
                             placeholder='Harga'
-                            defaultValue={ this.state.price }
+                            value={ this.state.price }
                             onChange={ (e) => this.setState({ price: e.target.value }) }
                         />
                     </Form.Group>
@@ -285,7 +285,7 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Ukuran</Form.Label>
                         <Form.Select
-                            defaultValue={ this.state.size }
+                            value={ this.state.size }
                             onChange={ (e) => this.setState({ size: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
@@ -300,7 +300,7 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Area Provinsi</Form.Label>
                         <Form.Select
-                            defaultValue={ this.state.province }
+                            value={ this.state.province }
                             onChange={ (e) => this.setState({ province: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
@@ -315,7 +315,7 @@ class TableData extends PureComponent {
                     <Form.Group className="mb-3">
                         <Form.Label>Area kota</Form.Label>
                         <Form.Select
-                            defaultValue={ this.state.city }
+                            value={ this.state.city }
                             onChange={ (e) => this.setState({ city: e.target.value }) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>

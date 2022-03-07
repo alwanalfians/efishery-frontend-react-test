@@ -35,7 +35,9 @@ const reducer = (state = initialState, action) => {
         case 'DELETE_FISH_DATA':
             return {
                 ...state,
-                fishData: state.state.fishData.filter(({ uuid }) => uuid !== action.data.uuid)
+                state: {
+                    fishData: state.state.fishData.filter(({ uuid }) => uuid !== action.data.uuid)
+                }
             }
         default:
             return {
