@@ -6,7 +6,7 @@ import CustomButton from '../Button';
 
 const TableData = (props) => {
 
-    const { data, loading, pageSize } = props;
+    const { data } = props;
 
     const columns = [
         {
@@ -18,7 +18,7 @@ const TableData = (props) => {
             title: 'Harga',
             dataIndex: 'price',
             key: 'price',
-            render: text => <>Rp. { helper.numberFormat(text, ',') }</>
+            render: text => <>Rp. { helper.numberFormat(text || 0, ',') }</>
         },
         {
             title: 'Ukuran',
@@ -58,8 +58,8 @@ const TableData = (props) => {
         <Table
             dataSource={ data }
             columns={ columns }
-            loading={ loading }
             bordered
+            size='small'
         />
     )
 }
