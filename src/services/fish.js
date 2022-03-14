@@ -21,9 +21,6 @@ export function getData() {
 }
 
 export function createData(payload) {
-
-    console.log(payload)
-
     return async dispatch => {
         try {
             const data = await store.append('list', [payload])

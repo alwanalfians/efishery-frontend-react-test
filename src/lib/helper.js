@@ -138,6 +138,13 @@ export const getCurrentDate = () => {
     return (date)
 }
 
+export const getCurrentTime = () => {
+
+    const date = new Date()
+
+    return (date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds())
+}
+
 export const isEmpty = (object) => {
 
     for (var key in object) {

@@ -8,6 +8,9 @@ import './TableData.scss';
 import Swal from 'sweetalert2';
 import { Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { v4 } from 'node-uuid';
+import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import Text from 'antd/lib/typography/Text';
 
 
 class TableData extends PureComponent {
@@ -16,6 +19,7 @@ class TableData extends PureComponent {
         super(props)
 
         this.state = {
+            loading: false,
             searchText: '',
             commodity: '',
             province: '',
@@ -27,12 +31,15 @@ class TableData extends PureComponent {
             showForm: false,
             sizeDataList: [],
             areaDataList: [],
+            provinceDataList: [],
+            cityDataList: []
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
+        
         fishService.getDataSize().then((response) => {
             if (response) {
                 this.setState({ sizeDataList: response });
@@ -41,7 +48,10 @@ class TableData extends PureComponent {
 
         fishService.getDataArea().then((response) => {
             if (response) {
-                this.setState({ areaDataList: response })
+                const distinctDataArea = [... new Map(response.map(item => [item['province'], item])).values()];
+
+                this.setState({ provinceDataList: distinctDataArea });
+                this.setState({ areaDataList: response });
             };
         });
     };
@@ -52,32 +62,57 @@ class TableData extends PureComponent {
                 title: 'Komoditas',
                 dataIndex: 'komoditas',
                 key: 'komoditas',
+                sorter: (a, b) => {
+                    if (a.komoditas.toLowerCase() > b.komoditas.toLowerCase())
+                        return -1;
+                    if (a.komoditas.toLowerCase() < b.komoditas.toLowerCase())
+                        return 1;
+                    return 0;
+                },
             },
             {
                 title: 'Harga',
                 dataIndex: 'price',
                 key: 'price',
+                sorter: (a, b) => a.price - b.price,
                 render: text => <>Rp. { helper.numberFormat(text || 0, ',') }</>
             },
             {
                 title: 'Ukuran',
                 dataIndex: 'size',
-                key: 'size'
+                key: 'size',
+                sorter: (a, b) => a.size - b.size,
             },
             {
                 title: 'Area Provinsi',
                 dataIndex: 'area_provinsi',
-                key: 'area_provinsi'
+                key: 'area_provinsi',
+                sorter: (a, b) => {
+                    if (a.area_provinsi.toLowerCase() > b.area_provinsi.toLowerCase())
+                        return -1;
+                    if (a.area_provinsi.toLowerCase() < b.area_provinsi.toLowerCase())
+                        return 1;
+                    return 0;
+                },
             },
             {
                 title: 'Area Kota',
                 dataIndex: 'area_kota',
                 key: 'area_kota',
+                sorter: (a, b) => {
+                    if (a.area_kota.toLowerCase() > b.area_kota.toLowerCase())
+                        return -1;
+                    if (a.area_kota.toLowerCase() < b.area_kota.toLowerCase())
+                        return 1;
+                    return 0;
+                },
             },
             {
                 title: 'Tanggal',
                 dataIndex: 'tgl_parsed',
                 key: 'tgl_parsed',
+                defaultSortOrder: 'descend',
+                sorter: (a, b) => new Date(a.tgl_parsed) - new Date(b.tgl_parsed),
                 render: text => <>{ helper.dateParser(text) ? helper.dateParser(text) : '' }</>
             },
             {
@@ -87,7 +122,8 @@ class TableData extends PureComponent {
                 render: (text, record) => (
                     <Space>
                         <CustomButton
-                            type="default"
+                            icon={<EditOutlined/>}
+                            type="primary"
                             size="default"
                             text="Edit"
                             onClick={ () => {
@@ -96,11 +132,12 @@ class TableData extends PureComponent {
                                 }
                             }
                         />
-                        <CustomButton 
+                        <CustomButton
+                            icon={<DeleteOutlined/>} 
                             type="danger"
                             size="default"
                             text="Delete"
-                            ghost={ true }
+                            // ghost={ true }
                             onClick={ () => {
                                 this.handleDeleteData(record.uuid);
                             }
@@ -126,6 +163,18 @@ class TableData extends PureComponent {
         );
     }
 
+    filteredDataKota = (valueProvince) => {
+
+        const filteredData = this.state.areaDataList.filter(item => (item.province == valueProvince))
+
+        this.setState({ province: valueProvince})
+
+        if (filteredData.length > 0) {
+            this.setState({ cityDataList: filteredData })
+            this.setState({ city: filteredData[0].city })
+        }
+    }
+
     handleShowForm (value, formType = "add") {
         if (value === false) {
             this.setState({
@@ -145,6 +194,9 @@ class TableData extends PureComponent {
     };
 
     handleEditData = (data) => {
+
+        this.filteredDataKota(data.area_provinsi);
+
         this.setState({
             uuid: data.uuid,
             commodity: data.komoditas,
@@ -171,14 +223,15 @@ class TableData extends PureComponent {
             showLoaderOnConfirm: true,
             preConfirm: () => {
                 if (formType === 'add') {
+                    this.setState({ loading: true })
                     this.props.createData({
                         komoditas: commodity,
                         area_provinsi: province,
                         area_kota: city,
                         size: size,
                         price: price,
-                        tgl_parsed: date,
-                        uuid: 'id' + helper.getCurrentDay() + '' + helper.getCurrentMonth() + '' + helper.getCurrentYear() + '' + Math.random()
+                        tgl_parsed: date + ' ' + helper.getCurrentTime(),
+                        uuid: v4()
                     }).then(() => {
                         Swal.fire({
                             title: "Success!",
@@ -187,11 +240,13 @@ class TableData extends PureComponent {
                         })
                         .then((res) => {
                             if (res.value) {
+                                this.setState({ loading: false })
                                 this.handleShowForm(false);
                             }
                         })
                     })
                 } else {
+                    this.setState({ loading: true })
                     this.props.updateData({
                         uuid: uuid,
                         komoditas: commodity,
@@ -199,7 +254,7 @@ class TableData extends PureComponent {
                         area_kota: city,
                         size: size,
                         price: price,
-                        tgl_parsed: date
+                        tgl_parsed: date + ' ' + helper.getCurrentTime()
                     }).then(() => {
                         Swal.fire({
                             title: "Success!",
@@ -208,6 +263,7 @@ class TableData extends PureComponent {
                         })
                         .then((res) => {
                             if (res.value) {
+                                this.setState({ loading: false })
                                 this.handleShowForm(false);
                             }
                         })
@@ -229,7 +285,16 @@ class TableData extends PureComponent {
             cancelButtonText: 'Cancel',
             showLoaderOnConfirm: true,
             preConfirm: () => {
+                Swal.fire({
+                    title: 'Please Wait..',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
                 this.props.deleteData({uuid: id}).then(() => {
+                    Swal.close();
                     Swal.fire({
                         title: "Success!",
                         text: "Data berhasil dihapus",
@@ -253,12 +318,18 @@ class TableData extends PureComponent {
                 visible={ this.state.showForm }
                 onCancel={ () => this.handleShowForm(false) }
                 footer={[
-                    <Button key="back" onClick={ () => this.handleShowForm(false) }>
-                        Cancel
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={ this.handleSubmit } ghost>
-                        { this.state.formType === "add" ? 'Submit' : 'Save Changes' }
-                    </Button>
+                    <CustomButton
+                        key="back"
+                        onClick={ () => this.handleShowForm(false) }
+                        text="Cancel"
+                    />,
+                    <CustomButton
+                        key="submit"
+                        type="success"
+                        onClick={ this.handleSubmit }
+                        loading={ this.state.loading }
+                        text={ this.state.formType === "add" ? 'Submit' : 'Save Changes' }
+                    />
                 ]}
             >
                 <Form>
@@ -301,11 +372,11 @@ class TableData extends PureComponent {
                         <Form.Label>Area Provinsi</Form.Label>
                         <Form.Select
                             value={ this.state.province }
-                            onChange={ (e) => this.setState({ province: e.target.value }) }
+                            onChange={ (e) => this.filteredDataKota(e.target.value) }
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
                             {
-                                this.state.areaDataList.map((item, index) => {
+                                this.state.provinceDataList.map((item, index) => {
                                     return <option key={ index+1 } value={ item.province }>{ item.province }</option>
                                 })
                             }
@@ -320,7 +391,7 @@ class TableData extends PureComponent {
                         >
                             <option key={ 0 } value={ '' } disabled>- Pilih -</option>
                             {
-                                this.state.areaDataList.map((item, index) => {
+                                this.state.cityDataList.map((item, index) => {
                                     return <option key={ index+1 } value={ item.city }>{ item.city }</option>
                                 })
                             }
@@ -335,16 +406,24 @@ class TableData extends PureComponent {
         return (
             <>
                 <Row justify="end" className='row-margin-bot'>
+                    <Col span={ 22 }>
+                        <Typography.Title level={2}>Data Komoditas Ikan</Typography.Title>
+                    </Col>
                     <Col span={ 2 }>
-                        <CustomButton type="primary" size="default" text="Add" block={ true } ghost={ true } onClick={ () => this.handleShowForm(true, 'add') }/>
+                        <CustomButton
+                            icon={<PlusOutlined/>}
+                            type="success"
+                            size="default"
+                            text="Add"
+                            block={ true }
+                            onClick={ () => this.handleShowForm(true, 'add') }
+                        />
                     </Col>
                 </Row>
                 <Row justify="end" className='row-margin-bot'>
-                    <Col span={ 20 }>
-                        <Typography.Title level={2}>Data Komoditas</Typography.Title>
-                    </Col>
                     <Col span={ 4 }>
                         <Input
+                            prefix={<SearchOutlined/>}
                             onChange={ (e) => this.setState({ searchText: e.target.value }) }
                             placeholder="Search..."
                         />

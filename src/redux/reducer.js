@@ -2,8 +2,6 @@ import initialState from './state';
 
 const reducer = (state = initialState, action) => {
 
-    console.log(action)
-
     switch (action.type) {
         case 'GET_FISH_DATA':
             return {
