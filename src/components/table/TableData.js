@@ -1,4 +1,4 @@
-import { Table, Space, Row, Col, Input, Modal, Button, Typography } from 'antd';
+import { Table, Space, Row, Col, Input, Modal, Typography } from 'antd';
 import React, { PureComponent } from 'react';
 import 'antd/dist/antd.css';
 import * as helper from '../../lib/helper';
@@ -10,7 +10,6 @@ import { Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { v4 } from 'node-uuid';
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import Text from 'antd/lib/typography/Text';
 
 
 class TableData extends PureComponent {
