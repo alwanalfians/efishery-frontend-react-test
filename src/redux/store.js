@@ -7,7 +7,7 @@ const persistedState = loadState();
 const store = createStore(reducer, persistedState, applyMiddleware(thunkMiddleware));
 
 store.subscribe(() => {
-    saveState('state', store.getState());
+    saveState(store.getState());
 });
 
 export default store;
