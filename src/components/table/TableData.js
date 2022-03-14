@@ -47,7 +47,7 @@ class TableData extends PureComponent {
 
         fishService.getDataArea().then((response) => {
             if (response) {
-                const distinctDataArea = [... new Map(response.map(item => [item['province'], item])).values()];
+                const distinctDataArea = [...new Map(response.map(item => [item['province'], item])).values()];
 
                 this.setState({ provinceDataList: distinctDataArea });
                 this.setState({ areaDataList: response });
