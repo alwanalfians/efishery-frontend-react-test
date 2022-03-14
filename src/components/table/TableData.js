@@ -165,7 +165,7 @@ class TableData extends PureComponent {
 
     filteredDataKota = (valueProvince) => {
 
-        const filteredData = this.state.areaDataList.filter(item => (item.province == valueProvince))
+        const filteredData = this.state.areaDataList.filter(item => (item.province === valueProvince))
 
         this.setState({ province: valueProvince})
 
