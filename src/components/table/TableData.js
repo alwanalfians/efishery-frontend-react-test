@@ -8,7 +8,7 @@ import './TableData.scss';
 import Swal from 'sweetalert2';
 import { Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { v4 } from 'node-uuid';
+import { v4 } from 'uuid';
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 
